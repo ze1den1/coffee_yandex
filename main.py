@@ -5,14 +5,17 @@ from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtSql import QSqlTableModel, QSqlDatabase
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 
-con = sqlite3.connect('coffee.sqlite')
+from UI.main import Ui_Coffee
+from UI.addEditCoffeeForm import Ui_AddForm
+
+con = sqlite3.connect('data/coffee.sqlite')
 cur = con.cursor()
 
 
-class AddEdit(QWidget):
+class AddEdit(QWidget, Ui_AddForm):
     def __init__(self):
         super().__init__()
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         self.__i = 0
 
         self.execute.clicked.connect(self.run)
@@ -66,20 +69,20 @@ class AddEdit(QWidget):
         self.taste.setText('')
 
 
-class Coffee(QMainWindow):
+class Coffee(QMainWindow, Ui_Coffee):
     def __init__(self):
         super().__init__()
+        self.setupUi(self)
         self._add_edit = AddEdit()
 
         db = QSqlDatabase.addDatabase('QSQLITE')
-        db.setDatabaseName('coffee.sqlite')
+        db.setDatabaseName('data/coffee.sqlite')
         db.open()
         model = QSqlTableModel(self, db)
         model.setTable('coffee')
         model.select()
         db.close()
 
-        uic.loadUi('main.ui', self)
         self.coffee_view.setModel(model)
 
         self.add_btn.clicked.connect(self.add_edit_show)
@@ -87,7 +90,7 @@ class Coffee(QMainWindow):
 
     def update_table(self):
         db = QSqlDatabase.addDatabase('QSQLITE')
-        db.setDatabaseName('coffee.sqlite')
+        db.setDatabaseName('data/coffee.sqlite')
         db.open()
         model = QSqlTableModel(self, db)
         model.setTable('coffee')
